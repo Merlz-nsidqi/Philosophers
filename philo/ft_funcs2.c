@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 14:34:37 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/04 16:19:42 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/06 15:49:43 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,13 +94,15 @@ int	ft_usleep(size_t milliseconds, t_loop *lst)
 	start = time_count();
 	while ((time_count() - start) < milliseconds)
 	{
-		pthread_mutex_lock(&lst->info->mut);
+		if (pthread_mutex_lock(&lst->info->mut) != 0)
+			return (1);
 		if (lst->info->died == 1)
 		{
 			pthread_mutex_unlock(&lst->info->mut);
 			return (1);
 		}
-		pthread_mutex_unlock(&lst->info->mut);
+		if (pthread_mutex_unlock(&lst->info->mut) != 0)
+			return (1);
 		usleep(100);
 	}
 	return (0);

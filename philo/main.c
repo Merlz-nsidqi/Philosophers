@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 11:24:32 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/04 16:40:27 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/06 15:28:52 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,14 +98,26 @@ int	main(int ac, char **av)
 {
 	t_info	*inf;
 	t_loop	*p;
+	int		t;
 
 	if (start(ac, av, &inf, &p) == 0)
 	{
-		pthread_mutex_init(&inf->mut, NULL);
+		if (pthread_mutex_init(&inf->mut, NULL) != 0)
+			return (freeing(&inf, &p), 1);
 		if (inf->philo_num == 1)
 			one_philo(&inf, &p);
 		else
+		{
+			t = inf->philo_num;
+			while (t > 0)
+			{
+				if (pthread_mutex_init(&p->fork, NULL) != 0)
+					return (freeing(&inf, &p), 1);
+				p = p->next;
+				t--;
+			}
 			run(&inf, &p);
+		}
 	}
 	freeing(&inf, &p);
 	return (0);

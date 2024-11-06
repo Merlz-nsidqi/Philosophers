@@ -6,25 +6,11 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 16:46:27 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/04 16:42:45 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/06 15:43:30 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lib.h"
-
-long long	time_count(void)
-{
-	struct timeval	time;
-	int				t;
-
-	t = gettimeofday(&time, NULL);
-	if (t != 0)
-	{
-		write(2, "gettimeofday failed\n", 20);
-		return (0);
-	}
-	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
-}
 
 int	list_put(t_info **inf, int *c, char *r)
 {
@@ -89,7 +75,8 @@ void	*monitor(void *arg)
 	lst = (struct t_loop *)arg;
 	while (1)
 	{
-		pthread_mutex_lock(&lst->info->mut);
+		if (pthread_mutex_lock(&lst->info->mut) != 0)
+			return (0);
 		if (lst->info->died == 1 || lst->has_eaten == lst->info->philo_must_eat)
 		{
 			pthread_mutex_unlock(&lst->info->mut);
@@ -99,16 +86,28 @@ void	*monitor(void *arg)
 		{
 			pthread_mutex_unlock(&lst->info->mut);
 			printing("died", lst, lst->last_eaten);
-			pthread_mutex_lock(&lst->info->mut);
-			lst->info->died = 1;
-			pthread_mutex_unlock(&lst->info->mut);
 			break ;
 		}
-		pthread_mutex_unlock(&lst->info->mut);
-		usleep(100);
+		if (pthread_mutex_unlock(&lst->info->mut) != 0)
+			return (0);
 		lst = lst->next;
 	}
 	return (NULL);
+}
+
+int	moni_create(t_info **inf, t_loop **p)
+{
+	if (pthread_create(&(*inf)->monit, NULL, monitor, *p) != 0)
+	{
+		write(2, "Creation of thread failed\n", 26);
+		return (1);
+	}
+	if (pthread_join((*inf)->monit, NULL) != 0)
+	{
+		write(2, "Joining of thread failed\n", 25);
+		return (1);
+	}
+	return (0);
 }
 
 void	run(t_info **inf, t_loop **p)
@@ -118,22 +117,24 @@ void	run(t_info **inf, t_loop **p)
 	t = (*inf)->philo_num;
 	while (t > 0)
 	{
-		pthread_mutex_init(&(*p)->fork, NULL);
+		if (pthread_create(&(*p)->thread, NULL, life, *p) != 0)
+		{
+			write(2, "Creation of thread failed\n", 26);
+			return ;
+		}
 		*p = (*p)->next;
 		t--;
 	}
+	if (moni_create(inf, p) == 1)
+		return ;
 	while (t < (*inf)->philo_num)
 	{
-		pthread_create(&(*p)->thread, NULL, life, *p);
+		if (pthread_join((*p)->thread, NULL) != 0)
+		{
+			write(2, "Joining of thread failed\n", 25);
+			return ;
+		}
 		*p = (*p)->next;
 		t++;
-	}
-	pthread_create(&(*inf)->monit, NULL, monitor, *p);
-	pthread_join((*inf)->monit, NULL);
-	while (t > 0)
-	{
-		pthread_join((*p)->thread, NULL);
-		*p = (*p)->next;
-		t--;
 	}
 }

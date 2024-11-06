@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 16:05:01 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/04 16:39:31 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/06 15:49:14 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,21 @@ void	printing(char *msg, t_loop *lst, long long m)
 {
 	long long	time;
 
-	pthread_mutex_lock(&lst->info->mut);
+	if (pthread_mutex_lock(&lst->info->mut) != 0)
+		return ;
 	if (lst->info->died == 0)
 	{
 		time = time_count();
 		printf("%lld  %d %s\n", time - m, lst->id, msg);
 	}
-	pthread_mutex_unlock(&lst->info->mut);
+	if (pthread_mutex_unlock(&lst->info->mut) != 0)
+		return ;
+	if (ft_strcmp(msg, "died") == 0)
+	{
+		if (pthread_mutex_lock(&lst->info->mut) != 0)
+			return ;
+		lst->info->died = 1;
+		if (pthread_mutex_unlock(&lst->info->mut) != 0)
+			return ;
+	}
 }

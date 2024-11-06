@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 13:57:17 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/04 16:40:31 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/06 15:49:27 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ char		**ft_split(char *s, char c);
 int			ft_strlen(char *s);
 long long	ft_atoi(const char *str);
 char		*ft_strchr(const char *s, int c);
+int			ft_strcmp(const char *s1, const char *s2);
 //parsing funcs:
 int			list_put(t_info **inf, int *c, char *r);
 int			parse(char **av, int *c, t_info **inf, int j);
