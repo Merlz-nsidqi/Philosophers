@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 11:24:32 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/06 15:28:52 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/09 12:12:04 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,8 @@ void	one_philo(t_info **inf, t_loop **p)
 
 	t = time_count();
 	printf("%lld  %d has taken a fork\n", t - (*inf)->start_time, (*p)->id);
-	t = time_count();
-	ft_usleep((*inf)->eat_time, *p);
-	printf("%lld  %d died\n", t - (*inf)->start_time, (*p)->id);
+	ft_usleep((*inf)->death_time, *p);
+	printf("%lld  %d died\n", (*inf)->death_time, (*p)->id);
 }
 
 void	freeing(t_info **inf, t_loop **p)
@@ -98,24 +97,15 @@ int	main(int ac, char **av)
 {
 	t_info	*inf;
 	t_loop	*p;
-	int		t;
 
 	if (start(ac, av, &inf, &p) == 0)
 	{
-		if (pthread_mutex_init(&inf->mut, NULL) != 0)
-			return (freeing(&inf, &p), 1);
 		if (inf->philo_num == 1)
 			one_philo(&inf, &p);
 		else
 		{
-			t = inf->philo_num;
-			while (t > 0)
-			{
-				if (pthread_mutex_init(&p->fork, NULL) != 0)
-					return (freeing(&inf, &p), 1);
-				p = p->next;
-				t--;
-			}
+			if (mutex_init(&p, &inf) == 1)
+				return (1);
 			run(&inf, &p);
 		}
 	}

@@ -6,14 +6,14 @@
 #    By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/20 12:32:39 by nsidqi            #+#    #+#              #
-#    Updated: 2024/11/06 12:51:23 by nsidqi           ###   ########.fr        #
+#    Updated: 2024/11/09 12:11:09 by nsidqi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SRC = main.c ft_funcs.c ft_funcs2.c store.c actions.c added.c\
+SRC = main.c ft_funcs.c ft_funcs2.c store.c actions.c added.c funcs.c\
 
 all: $(NAME)
 

@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 16:46:27 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/06 15:43:30 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/09 11:52:30 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,20 +75,17 @@ void	*monitor(void *arg)
 	lst = (struct t_loop *)arg;
 	while (1)
 	{
-		if (pthread_mutex_lock(&lst->info->mut) != 0)
+		if (check(lst) == 1)
 			return (0);
-		if (lst->info->died == 1 || lst->has_eaten == lst->info->philo_must_eat)
-		{
-			pthread_mutex_unlock(&lst->info->mut);
-			break ;
-		}
+		if (pthread_mutex_lock(&lst->info->last_eat) != 0)
+			return (0);
 		if ((time_count() - lst->last_eaten) >= lst->info->death_time)
 		{
-			pthread_mutex_unlock(&lst->info->mut);
-			printing("died", lst, lst->last_eaten);
+			printing("died", lst, lst->info->start_time);
+			pthread_mutex_unlock(&lst->info->last_eat);
 			break ;
 		}
-		if (pthread_mutex_unlock(&lst->info->mut) != 0)
+		if (pthread_mutex_unlock(&lst->info->last_eat) != 0)
 			return (0);
 		lst = lst->next;
 	}

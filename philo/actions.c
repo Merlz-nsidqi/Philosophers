@@ -6,30 +6,11 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 15:20:50 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/06 15:48:58 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/09 11:59:49 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lib.h"
-
-int	ft_strcmp(const char *s1, const char *s2)
-{
-	size_t	i;
-
-	i = 0;
-	while (s1[i] || s2[i])
-	{
-		if (s1[i] != s2[i])
-		{
-			if ((s1[i] - s2[i]) > 0)
-				return (1);
-			else
-				return (-1);
-		}
-		i++;
-	}
-	return (0);
-}
 
 long long	time_count(void)
 {
@@ -45,15 +26,35 @@ long long	time_count(void)
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-int	nor(t_loop *lst)
+int	check(t_loop *lst)
 {
+	if (pthread_mutex_lock(&lst->info->die) != 0)
+		return (1);
 	if (pthread_mutex_lock(&lst->info->mut) != 0)
 		return (1);
 	if (lst->info->died == 1 || lst->has_eaten == lst->info->philo_must_eat)
 	{
 		pthread_mutex_unlock(&lst->info->mut);
+		pthread_mutex_unlock(&lst->info->die);
 		return (1);
 	}
+	if (pthread_mutex_unlock(&lst->info->mut) != 0)
+		return (1);
+	if (pthread_mutex_unlock(&lst->info->die) != 0)
+		return (1);
+	return (0);
+}
+
+int	update(t_loop *lst)
+{
+	if (pthread_mutex_lock(&lst->info->last_eat) != 0)
+		return (1);
+	lst->last_eaten = time_count();
+	if (pthread_mutex_unlock(&lst->info->last_eat) != 0)
+		return (1);
+	if (pthread_mutex_lock(&lst->info->mut) != 0)
+		return (1);
+	lst->has_eaten++;
 	if (pthread_mutex_unlock(&lst->info->mut) != 0)
 		return (1);
 	return (0);
@@ -61,7 +62,7 @@ int	nor(t_loop *lst)
 
 int	eat(t_loop *lst)
 {
-	if (nor(lst) == 1)
+	if (check(lst) == 1)
 		return (-1);
 	if (pthread_mutex_lock(&lst->fork) != 0)
 		return (1);
@@ -70,11 +71,7 @@ int	eat(t_loop *lst)
 		return (1);
 	printing("has taken a fork", lst, lst->info->start_time);
 	printing("is eating", lst, lst->info->start_time);
-	if (pthread_mutex_lock(&lst->info->mut) != 0)
-		return (1);
-	lst->last_eaten = time_count();
-	lst->has_eaten++;
-	if (pthread_mutex_unlock(&lst->info->mut) != 0)
+	if (update(lst) == 1)
 		return (1);
 	if (ft_usleep(lst->info->eat_time, lst) == 1)
 	{
@@ -97,16 +94,16 @@ void	*life(void *arg)
 		usleep(100);
 	while (1)
 	{
-		if (nor(lst) == 1)
+		if (check(lst) == 1)
 			break ;
 		if (eat(lst) != 0)
 			break ;
-		if (nor(lst) == 1)
+		if (check(lst) == 1)
 			break ;
 		printing("is sleeping", lst, lst->info->start_time);
 		if (ft_usleep(lst->info->sleep_time, lst) == 1)
 			break ;
-		if (nor(lst) == 1)
+		if (check(lst) == 1)
 			break ;
 		printing("is thinking", lst, lst->info->start_time);
 	}

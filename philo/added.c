@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 16:05:01 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/06 15:49:14 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/09 11:40:58 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,25 +62,42 @@ t_loop	*new(t_info **inf, int i)
 	return (new);
 }
 
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	size_t	i;
+
+	i = 0;
+	while (s1[i] || s2[i])
+	{
+		if (s1[i] != s2[i])
+		{
+			if ((s1[i] - s2[i]) > 0)
+				return (1);
+			else
+				return (-1);
+		}
+		i++;
+	}
+	return (0);
+}
+
 void	printing(char *msg, t_loop *lst, long long m)
 {
 	long long	time;
 
-	if (pthread_mutex_lock(&lst->info->mut) != 0)
+	if (pthread_mutex_lock(&lst->info->print) != 0)
 		return ;
+	if (pthread_mutex_lock(&lst->info->die) != 0)
+		return ;
+	time = time_count();
 	if (lst->info->died == 0)
 	{
-		time = time_count();
 		printf("%lld  %d %s\n", time - m, lst->id, msg);
+		if (ft_strcmp(msg, "died") == 0)
+			lst->info->died = 1;
 	}
-	if (pthread_mutex_unlock(&lst->info->mut) != 0)
+	if (pthread_mutex_unlock(&lst->info->die) != 0)
 		return ;
-	if (ft_strcmp(msg, "died") == 0)
-	{
-		if (pthread_mutex_lock(&lst->info->mut) != 0)
-			return ;
-		lst->info->died = 1;
-		if (pthread_mutex_unlock(&lst->info->mut) != 0)
-			return ;
-	}
+	if (pthread_mutex_unlock(&lst->info->print) != 0)
+		return ;
 }
