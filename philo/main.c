@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 11:24:32 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/09 12:12:04 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/11 09:45:11 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,12 +78,16 @@ void	freeing(t_info **inf, t_loop **p)
 {
 	int	t;
 
-	if (*inf != NULL)
-		free(*inf);
-	if (*inf == NULL || *p == NULL)
+	if (*inf == NULL)
 		return ;
 	t = (*inf)->philo_num;
 	pthread_mutex_destroy(&(*inf)->mut);
+	pthread_mutex_destroy(&(*inf)->die);
+	pthread_mutex_destroy(&(*inf)->last_eat);
+	pthread_mutex_destroy(&(*inf)->print);
+	free(*inf);
+	if (*p == NULL)
+		return ;
 	while (t > 0)
 	{
 		pthread_mutex_destroy(&(*p)->fork);
