@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 11:24:32 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/11 09:45:11 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/12 09:19:19 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,14 +104,12 @@ int	main(int ac, char **av)
 
 	if (start(ac, av, &inf, &p) == 0)
 	{
+		if (mutex_init(&p, &inf) == 1)
+			return (1);
 		if (inf->philo_num == 1)
 			one_philo(&inf, &p);
 		else
-		{
-			if (mutex_init(&p, &inf) == 1)
-				return (1);
 			run(&inf, &p);
-		}
 	}
 	freeing(&inf, &p);
 	return (0);
