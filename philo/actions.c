@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 15:20:50 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/09 11:59:49 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/12 09:48:41 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,24 @@ int	check(t_loop *lst)
 	return (0);
 }
 
-int	update(t_loop *lst)
+int	update(t_loop *lst, int l)
 {
-	if (pthread_mutex_lock(&lst->info->last_eat) != 0)
-		return (1);
-	lst->last_eaten = time_count();
-	if (pthread_mutex_unlock(&lst->info->last_eat) != 0)
-		return (1);
-	if (pthread_mutex_lock(&lst->info->mut) != 0)
-		return (1);
-	lst->has_eaten++;
-	if (pthread_mutex_unlock(&lst->info->mut) != 0)
-		return (1);
+	if (l == 1)
+	{
+		if (pthread_mutex_lock(&lst->info->last_eat) != 0)
+			return (1);
+		lst->last_eaten = time_count();
+		if (pthread_mutex_unlock(&lst->info->last_eat) != 0)
+			return (1);
+	}
+	else
+	{
+		if (pthread_mutex_lock(&lst->info->mut) != 0)
+			return (1);
+		lst->has_eaten++;
+		if (pthread_mutex_unlock(&lst->info->mut) != 0)
+			return (1);
+	}
 	return (0);
 }
 
@@ -71,7 +77,7 @@ int	eat(t_loop *lst)
 		return (1);
 	printing("has taken a fork", lst, lst->info->start_time);
 	printing("is eating", lst, lst->info->start_time);
-	if (update(lst) == 1)
+	if (update(lst, 1) == 1)
 		return (1);
 	if (ft_usleep(lst->info->eat_time, lst) == 1)
 	{
@@ -79,6 +85,8 @@ int	eat(t_loop *lst)
 		pthread_mutex_unlock(&lst->next->fork);
 		return (-1);
 	}
+	if (update(lst, 2) == 1)
+		return (1);
 	if (pthread_mutex_unlock(&lst->fork) == 0
 		&& pthread_mutex_unlock(&lst->next->fork) == 0)
 		return (0);
