@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 16:46:27 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/09 14:37:29 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/12 08:13:09 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,9 @@ void	*monitor(void *arg)
 		if ((time_count() - lst->last_eaten) >= lst->info->death_time)
 		{
 			printing("died", lst, lst->info->start_time);
+			pthread_mutex_lock(&lst->info->die);
+			lst->info->died = 1;
+			pthread_mutex_unlock(&lst->info->die);
 			pthread_mutex_unlock(&lst->info->last_eat);
 			break ;
 		}
