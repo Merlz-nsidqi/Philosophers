@@ -6,14 +6,17 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 13:57:17 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/09 12:12:22 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/13 08:31:42 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIB_H
 # define LIB_H
 
-# include <libc.h>
+# include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <sys/time.h>
 # include <pthread.h>
 
 typedef struct t_info

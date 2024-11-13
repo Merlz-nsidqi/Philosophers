@@ -6,7 +6,7 @@
 /*   By: nsidqi <nsidqi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 15:20:50 by nsidqi            #+#    #+#             */
-/*   Updated: 2024/11/12 09:48:41 by nsidqi           ###   ########.fr       */
+/*   Updated: 2024/11/13 08:36:56 by nsidqi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void	*life(void *arg)
 
 	lst = (struct t_loop *)arg;
 	if (lst->id % 2 == 0)
-		usleep(100);
+		usleep(500);
 	while (1)
 	{
 		if (check(lst) == 1)
